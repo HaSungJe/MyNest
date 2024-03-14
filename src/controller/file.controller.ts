@@ -1,7 +1,8 @@
-import { BadRequestException, Controller, Get, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Req, Res, Get, Post, Delete, UploadedFiles, UseInterceptors, Param } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
+import { Request, Response } from 'express';
 import { FileService } from '../service/file.service';  
 
 @Controller('file')
@@ -43,7 +44,43 @@ export class FileController {
         }
     }
 
-    // 파일업로드(디스크에 저장)
+    // 파일삭제
+    @Delete('delete')
+    async delete(@Req() req: Request) {
+        let files = req.body.files;
+
+        if (!Array.isArray(files)) {
+            return {
+                success: false,
+                err: '파일 정보가 올바르지 않습니다.'
+            }
+        }
+
+        let result = await this.service.delete(files);
+        let success_count = result.filter(e => e.delete).length
+        return {
+            success: true,
+            success_count: success_count,
+            fail_count: result.length-success_count,
+        }
+    }
+
+    // 이미지보기
+    @Get('/image/:file')
+    async image(@Res() res: Response, @Param('file') file:string) {
+        if (typeof file !== 'string' || file === "") {
+            return {
+                success: false,
+                err: '파일 정보가 올바르지 않습니다.'
+            }
+        }
+ 
+        let result = await this.service.image(file);
+        res.set('Content-Type', 'image/jpeg');
+        res.send(result.file)
+    }
+
+    // 파일업로드(디스크에 저장. 백업용)
     @Post("upload_disk")
     @UseInterceptors(FilesInterceptor('files', 10, {
         storage: diskStorage({
