@@ -4,11 +4,15 @@ import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
 import { Request, Response } from 'express';
 import { FileService } from '../service/file.service';  
+import { AWSService } from '../service/aws.service';  
 
 @Controller('file')
 export class FileController {
-    constructor(private readonly service: FileService) {}
-
+    constructor(
+        private readonly service: FileService,
+        private readonly AWS_service: AWSService,
+    ) {};
+    
     // 파일업로드
     @Post("upload")
     @UseInterceptors(FilesInterceptor('files', 10, {
@@ -19,7 +23,7 @@ export class FileController {
     }))
     async upload(@UploadedFiles() files: Express.Multer.File[]) {
         try {
-            let result = await this.service.upload(files);
+            let result = await this.AWS_service.s3_upload(files);
             let fails = [];
             for (let i=0; i<result.length; i++) {
                 if (result[i].aws_s3 === undefined) {
@@ -56,7 +60,7 @@ export class FileController {
             }
         }
 
-        let result = await this.service.delete(files);
+        let result = await this.AWS_service.s3_delete(files);
         let success_count = result.filter(e => e.delete).length
         return {
             success: true,
@@ -75,7 +79,7 @@ export class FileController {
             }
         }
  
-        let result = await this.service.image(file);
+        let result = await this.AWS_service.s3_image(file);
         res.set('Content-Type', 'image/jpeg');
         res.send(result.file)
     }
@@ -106,7 +110,5 @@ export class FileController {
             throw error;
         }
     }
-
-
 }
 
