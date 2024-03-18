@@ -1,22 +1,24 @@
 import { Controller, Post, Get, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { SNSService } from '../service/sns.service';
 import { AWSService } from '../service/aws.service';
-import { Util } from '../util/Util';
-import { Request } from 'express';
-const util = new Util();
+import { Page } from '../util/page';
+import * as util from '../util/util';
+
 
 @Controller("/sns")
 export class SNSController {
     constructor(
         private readonly service: SNSService,
-        private readonly AWS_service: AWSService
+        private readonly AWS_service: AWSService,
+        // private readonly util: Util
     ) {}
 
     // SMS 보내기
     @Post("/send")
-    async send(@Req() req: Request): Promise<any> {
+    async send(@Req() req: Request): Promise<object> {
         let mobile = req.body.mobile;
-        let message = req.body.message;
+        let message = req.body.message;        
 
         // 필수 파라미터 체크
         if (!util.isNull(mobile)) {

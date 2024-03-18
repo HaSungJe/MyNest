@@ -21,6 +21,8 @@ export class AWSService {
                 Body: files[i].buffer,
             };
 
+           
+
             try {
                 const result = await s3.upload(params).promise();
                 files[i]['aws_s3'] = result;

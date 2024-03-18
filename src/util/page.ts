@@ -1,4 +1,4 @@
-export class Paging {
+export class Page {
     size: number;
     pageSize: number;
     totalCount: number;
