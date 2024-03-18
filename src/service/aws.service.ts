@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3 } from 'aws-sdk';
+import { SNS, S3 } from 'aws-sdk';
 import * as moment from 'moment';
 
 @Injectable()
@@ -97,7 +97,32 @@ export class AWSService {
 
     /* ------------------------------------------------------- SNS ------------------------------------------------------- */
     // SNS 보내기
+    async SMS_send(mobile: string, message: string): Promise<any> {
+        const sns = new SNS({
+            region: process.env.AWS_SMS_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY,
+                secretAccessKey: process.env.AWS_SECRET_KEY
+            }
+        });
+        
+        const params = {
+            Message: message,
+            PhoneNumber: `+82${mobile}`
+        }
 
+        try {
+            let result = await sns.publish(params).promise();
+            return {
+                success: true
+            }
+        } catch (err) {
+            return {
+                success: false,
+                err: err.toString()
+            }
+        }
+    }
 
     /* ----------------------------------------------------- DynamoDB ---------------------------------------------------- */
     // DynamoDB 데이터 등록
