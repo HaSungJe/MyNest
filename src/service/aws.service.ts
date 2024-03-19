@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SNS, S3 } from 'aws-sdk';
+import { SNS, S3, DynamoDB } from 'aws-sdk';
 import * as moment from 'moment';
 
 @Injectable()
@@ -20,8 +20,6 @@ export class AWSService {
                 Key: `${moment().format('YYYYMMDDHHmmssSSS')}_${files[i].originalname}`,
                 Body: files[i].buffer,
             };
-
-           
 
             try {
                 const result = await s3.upload(params).promise();
@@ -128,9 +126,76 @@ export class AWSService {
 
     /* ----------------------------------------------------- DynamoDB ---------------------------------------------------- */
     // DynamoDB 데이터 등록
+    async Dynamo_put(message: string) {
+        let now = moment();
+        let seq = moment(now).format('YYYYMMDDHHmmssSSS');
+        let date = moment(now).format('YYYY-MM-DD HH:mm:ss');
 
-    // DynamoDB 데이터 
+        let dynamodb = new DynamoDB({
+            region: process.env.AWS_DynamoDB_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY,
+                secretAccessKey: process.env.AWS_SECRET_KEY
+            }
+        });
 
+        let params = {
+            TableName: process.env.AWS_DynamoDB_TableName,
+            Item: {
+                'seq': {N: seq},
+                'user_seq': {N: '1'},
+                'date': {S: date},
+                'message': {S: message}
+            }
+        }
+        
+        try {
+            let result = await dynamodb.putItem(params).promise();
+            return {
+                success: true
+            }
+        } catch (err) {
+            return {
+                success: false,
+                err: err.toString()
+            }
+        }
+    }
 
+    // DynamoDB 데이터 목록
+    async Dynamo_get() {
+        let dynamodb = new DynamoDB({
+            region: process.env.AWS_DynamoDB_REGION,
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY,
+                secretAccessKey: process.env.AWS_SECRET_KEY
+            }
+        });
 
+        let params = {
+            TableName: process.env.AWS_DynamoDB_TableName,
+            IndexName: "user_seq-seq-index",
+            KeyConditionExpression: "user_seq = :user_seq",
+            ExpressionAttributeValues: {
+                ":user_seq": {N: '1'}
+            },
+            Limit: 100,
+            ScanIndexForward: false
+        }
+        
+        try {
+            let result = await dynamodb.query(params).promise();
+            return {
+                success: true,
+                ScanCount: result.ScannedCount,
+                count: result.Count,
+                list: result.Items
+            }
+        } catch (err) {
+            return {
+                success: false,
+                err: err.toString()
+            }
+        }
+    }
 }

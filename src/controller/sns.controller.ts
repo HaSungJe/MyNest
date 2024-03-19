@@ -2,9 +2,7 @@ import { Controller, Post, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { SNSService } from '../service/sns.service';
 import { AWSService } from '../service/aws.service';
-import { Page } from '../util/page';
 import * as util from '../util/util';
-
 
 @Controller("/sns")
 export class SNSController {
