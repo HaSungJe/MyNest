@@ -16,6 +16,17 @@ export class AppController {
         return this.service.getJson();
     }
 
+    
+    // 테스트
+    @Get("/test")
+    async typeorm(): Promise<object> {
+        let result = await this.service.typeorm();
+        return {
+            success: true,
+            result: result
+        }
+    }
+
     // DynamoDB 데이터 등록
     @Put("/dynamodb/put")
     async DynamoDBPut(@Req() req: Request, @Res() res: Response) {
