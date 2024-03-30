@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserInfo } from '../entities/user_info.entity';
-import { EntitiyConstructor } from '../entities/entitiyConstructor';
+import { Entities, UserInfo } from '../entities/entities';
 
 @Injectable()
 export class AppService {
     constructor(
-        private readonly entityCon: EntitiyConstructor,
+        private readonly entityCon: Entities,
     ) {}
 
     getJson(): object {

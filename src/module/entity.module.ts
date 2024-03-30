@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserInfo } from '../entities/user_info.entity';
-import { OnlineSale } from '../entities/online_sale.entity';
+import * as entities from '../entities/entities';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserInfo, OnlineSale])],
+    imports: [TypeOrmModule.forFeature(Object.values(entities))],
     exports: [TypeOrmModule]
 })
 

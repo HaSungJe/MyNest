@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntityModule } from './entity.module';
 import typeOrmConfig from '../../typeorm.config';
 
-import { EntitiyConstructor } from '../entities/entitiyConstructor';
+import { Entities } from '../entities/entities';
 import { AppController } from '../controller/app.controller';
 import { AppService } from '../service/app.service';
 import { AWSService } from '../service/aws.service';
@@ -14,6 +14,6 @@ import { AWSService } from '../service/aws.service';
         EntityModule,
     ],
     controllers: [AppController],
-    providers: [EntitiyConstructor, AppService, AWSService],
+    providers: [Entities, AppService, AWSService],
 })
 export class AppModule {}
