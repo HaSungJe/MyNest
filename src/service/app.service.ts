@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UserInfo } from '../entities/user_info.entity';
-import { Entities } from '../entities/entities';
+import { EntitiyConstructor } from '../entities/entitiyConstructor';
 
 @Injectable()
 export class AppService {
     constructor(
-        private readonly entities: Entities,
+        private readonly entityCon: EntitiyConstructor,
     ) {}
 
     getJson(): object {
@@ -16,7 +16,7 @@ export class AppService {
     }
 
     async typeorm() {
-        let builder = this.entities.onlineSaleRepo.createQueryBuilder('s');
+        let builder = this.entityCon.onlineSaleRepo.createQueryBuilder('s');
         builder.select([
             'DATE_FORMAT(s.sales_date, "%Y") AS year',
             'DATE_FORMAT(s.sales_date, "%m") AS month',
@@ -27,7 +27,7 @@ export class AppService {
         builder.where('u.gender in (0, 1)');
 
         let from = builder.getQuery();
-        builder = this.entities.onlineSaleRepo.createQueryBuilder();
+        builder = this.entityCon.onlineSaleRepo.createQueryBuilder();
         builder.select([
             'a.year',
             'a.month',
@@ -42,7 +42,7 @@ export class AppService {
         // console.log(result)
 
         return {
-            find: await this.entities.userInfoRepo.find(),
+            find: await this.entityCon.userInfoRepo.find(),
             builder: result
         }
     }

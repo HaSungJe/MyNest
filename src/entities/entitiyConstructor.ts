@@ -6,7 +6,7 @@ import { UserInfo } from './user_info.entity';
 import { OnlineSale } from './online_sale.entity';
 
 @Injectable()
-export class Entities {
+export class EntitiyConstructor {
     constructor(
         @InjectRepository(UserInfo)
         public readonly userInfoRepo: Repository<UserInfo>,
