@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { UserInfo } from '../entities/user_info.entity';
 import { Entities } from '../entities/entities';
 
 @Injectable()
 export class AppService {
     constructor(
-        private readonly entities: Entities
+        private readonly entities: Entities,
     ) {}
 
     getJson(): object {
@@ -15,8 +16,34 @@ export class AppService {
     }
 
     async typeorm() {
+        let builder = this.entities.onlineSaleRepo.createQueryBuilder('s');
+        builder.select([
+            'DATE_FORMAT(s.sales_date, "%Y") AS year',
+            'DATE_FORMAT(s.sales_date, "%m") AS month',
+            'u.gender AS gender',
+            's.user_id AS user_id'
+        ]);
+        builder.innerJoin(UserInfo, 'u', 's.user_id = u.user_id');
+        builder.where('u.gender in (0, 1)');
+
+        let from = builder.getQuery();
+        builder = this.entities.onlineSaleRepo.createQueryBuilder();
+        builder.select([
+            'a.year',
+            'a.month',
+            'a.gender',
+            'count(distinct(a.user_id)) as users'
+        ]);
+        builder.from(`(${from})`, 'a');
+        builder.groupBy('a.year, a.month, a.gender');
+        builder.orderBy('a.year, a.month, a.gender');
+
+        let result = await builder.getRawMany()
+        // console.log(result)
+
         return {
-            find: await this.entities.userInfoRepo.find()
+            find: await this.entities.userInfoRepo.find(),
+            builder: result
         }
     }
 }

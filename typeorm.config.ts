@@ -10,7 +10,7 @@ const typeOrmConfig: TypeOrmModuleOptions = {
     username: process.env.AWS_RDB_MYSQL_ID,
     password: process.env.AWS_RDB_MYSQL_PW,
     entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    synchronize: process.env.DEV_MODE === 'T' ? true : false,
+    synchronize: process.env.DEV_MODE === 'T' ? true : false
 };
 
 export default typeOrmConfig;

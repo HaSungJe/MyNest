@@ -7,4 +7,5 @@ import { OnlineSale } from '../entities/online_sale.entity';
     imports: [TypeOrmModule.forFeature([UserInfo, OnlineSale])],
     exports: [TypeOrmModule]
 })
+
 export class EntityModule {}

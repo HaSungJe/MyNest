@@ -1,20 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { OnlineSale } from './online_sale.entity';
 
-@Entity()
+@Entity('user_info')
 export class UserInfo {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({name: 'user_id'})
     user_id: number;
 
-    @Column()
+    @Column({name: 'gender'})
     gender: number;
 
-    @Column()
+    @Column({name: 'age'})
     age: number;
 
-    @Column({ type: 'date' })
+    @Column({name: 'joind', type: 'date'})
     joined: Date;
 
-    @OneToMany(() => OnlineSale, onlineSale => onlineSale.user)
-    onlineSales: OnlineSale[];
+    @OneToMany(() => OnlineSale, online_sales => online_sales.user_id)
+    online_sales: OnlineSale[];
 }
