@@ -43,6 +43,14 @@ export class AppController {
         return res.status(status).send(result);
     }
 
+    // 정보
+    @Get('/info')
+    async typeormGet(@Req() req: Request, @Res() res: Response): Promise<object> {
+        let result = await this.service.typeormGet(req.query.seq);
+        let status = result.success ? 200 : 400;
+        return res.status(status).send(result);
+    }
+
     // DynamoDB 데이터 등록
     @Put("/dynamodb/put")
     async DynamoDBPut(@Req() req: Request, @Res() res: Response) {

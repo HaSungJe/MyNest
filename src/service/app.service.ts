@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Entities, UserInfo, Main, Sub } from '../entities/entities';
+import { Entities, Main, Sub } from '../entities/entities';
 import { DataSource } from 'typeorm';
 import * as moment from 'moment'
 
@@ -19,18 +19,19 @@ export class AppService {
 
     // typeorm query builder
     async typeorm() {
-        let builder = this.eitnties.onlineSaleRepo.createQueryBuilder('s');
+        let builder = this.dataSource.createQueryBuilder();
         builder.select([
             'DATE_FORMAT(s.sales_date, "%Y") AS year',
             'DATE_FORMAT(s.sales_date, "%m") AS month',
             'u.gender AS gender',
             's.user_id AS user_id'
         ]);
-        builder.innerJoin(UserInfo, 'u', 's.user_id = u.user_id');
+        builder.from('online_sale', 's');
+        builder.innerJoin('user_info', 'u', 's.user_id = u.user_id');
         builder.where('u.gender in (0, 1)');
 
         let from = builder.getQuery();
-        builder = this.eitnties.onlineSaleRepo.createQueryBuilder();
+        builder = this.dataSource.createQueryBuilder();
         builder.select([
             'a.year',
             'a.month',
@@ -42,7 +43,6 @@ export class AppService {
         builder.orderBy('a.year, a.month, a.gender');
 
         let result = await builder.getRawMany()
-        // console.log(result)
 
         return {
             find: await this.eitnties.userInfoRepo.find(),
@@ -85,8 +85,6 @@ export class AppService {
             console.log(result4)
 
             await conn.commitTransaction();
-
-
 
             return {
                 success: true,
@@ -133,6 +131,32 @@ export class AppService {
             }
         } finally {
             await conn.release();
+        }
+    }
+
+    // typeorm get
+    async typeormGet(seq) {
+        // let builder = await this.eitnties.mainRepo.createQueryBuilder('m');
+        let builder = this.dataSource.createQueryBuilder();
+        builder.select([
+            `m.seq`,
+            `m.ip`,
+            `DATE_FORMAT(m.reg_dt, "%Y-%m-%d %H:%i:%s.%S") as reg_dt`,
+            `DATE_FORMAT(m.mod_dt, "%Y-%m-%d %H:%i:%s.%S") as mod_dt`,
+            `s.data_1`,
+            `s.data_2`,
+            `s.data_3`
+        ]);
+        builder.from('t_main', 'm');
+        builder.leftJoin('t_sub', 's', 'm.seq = s.seq');
+        builder.where('m.seq = :seq', {seq: seq});
+
+        let result = await builder.getRawOne();
+        console.log(result)
+
+        return {
+            success: true,
+            result: result
         }
     }
 }
