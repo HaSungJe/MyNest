@@ -7,7 +7,7 @@ export class OnlineSale {
     online_sale_id: number;
 
     @ManyToOne(() => UserInfo, userInfo => userInfo.user_id)
-    @JoinColumn({name: 'user_id'})
+    @JoinColumn({name: 'user_id', referencedColumnName: 'user_id'})
     user_id: UserInfo;
 
     @Column({name: 'product_id'})

@@ -27,6 +27,13 @@ export class AppController {
         }
     }
 
+    @Put("/put")
+    async typeormPost(@Req() req: Request, @Res() res: Response): Promise<object> {
+        let result = await this.service.typeormPut(req.body, req.ip);
+        let status = result.success ? 200 : 400;
+        return res.status(status).send(result)
+    }
+
     // DynamoDB 데이터 등록
     @Put("/dynamodb/put")
     async DynamoDBPut(@Req() req: Request, @Res() res: Response) {

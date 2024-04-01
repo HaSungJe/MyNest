@@ -16,4 +16,5 @@ import { AWSService } from '../service/aws.service';
     controllers: [AppController],
     providers: [Entities, AppService, AWSService],
 })
+
 export class AppModule {}
