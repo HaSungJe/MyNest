@@ -8,14 +8,14 @@ export class OnlineSale {
 
     @ManyToOne(() => UserInfo, userInfo => userInfo.user_id)
     @JoinColumn({name: 'user_id', referencedColumnName: 'user_id'})
-    user_id: UserInfo;
+    user_id: UserInfo = null;
 
     @Column({name: 'product_id'})
-    product_id: number;
+    product_id: number = null;
 
     @Column({name: 'sales_amount'})
-    sales_amount: number;
+    sales_amount: number = null;
 
     @Column({name: 'sales_date', type: 'date'})
-    sales_date: Date;
+    sales_date: Date = null;
 }

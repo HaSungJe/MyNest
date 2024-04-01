@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Req, Res } from '@nestjs/common';
+import { Controller, Delete, Get, Put, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppService } from '../service/app.service';
 import { AWSService } from '../service/aws.service';
@@ -27,11 +27,20 @@ export class AppController {
         }
     }
 
+    // 등록
     @Put("/put")
-    async typeormPost(@Req() req: Request, @Res() res: Response): Promise<object> {
+    async typeormPut(@Req() req: Request, @Res() res: Response): Promise<object> {
         let result = await this.service.typeormPut(req.body, req.ip);
         let status = result.success ? 200 : 400;
-        return res.status(status).send(result)
+        return res.status(status).send(result);
+    }
+
+    // 삭제
+    @Delete('/del')
+    async typeormDel(@Req() req: Request, @Res() res: Response): Promise<object> {
+        let result = await this.service.typeormDel(req.body.seq);
+        let status = result.success ? 200 : 400;
+        return res.status(status).send(result);
     }
 
     // DynamoDB 데이터 등록
