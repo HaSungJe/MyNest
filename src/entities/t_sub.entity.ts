@@ -1,22 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 import { Main } from './t_main.entity';
 
-@Entity('t_sub')
+@Entity({name: 't_sub', comment: '서브 테이블'})
 export class Sub {
-    @PrimaryGeneratedColumn({name: 'sub_seq'})
+    @PrimaryGeneratedColumn({name: 'sub_seq', comment: '서브 식별자'})
     sub_seq: number = null;
 
     @ManyToOne(() => Main, main => main.seq, { nullable: false, cascade: true})
     @JoinColumn({name: 'seq', referencedColumnName: 'seq'})
     seq: Number = null;
 
-    @Column({name: 'data_1', nullable: false, length: 30})
+    @Column({name: 'data_1', nullable: false, length: 30, comment: '1번 데이터'})
     data_1: string = null;
 
-    @Column({name: 'data_2', nullable: false, length: 30})
+    @Column({name: 'data_2', nullable: false, length: 30, comment: '2번 데이터'})
     data_2: string = null;
 
-    @Column({name: 'data_3', nullable: false, length: 30})
+    @Column({name: 'data_3', nullable: false, length: 30, comment: '3번 데이터'})
     data_3: string = null;
 
     constructor(data: any) {
