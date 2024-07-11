@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource } from "typeorm";
-import { CheckEmailDTO, CheckNickDTO, UserAlarmDTO, UserLoginDTO, UserPatchBirthDTO, UserPatchNickDTO, UserPatchPWDTO, UserProfileDTO, UserPutDTO } from "./user.dto";
+import { CheckEmailDTO, CheckNickDTO, ExcelUserPutDTO, UserAlarmDTO, UserLoginDTO, UserPatchBirthDTO, UserPatchNickDTO, UserPatchPWDTO, UserProfileDTO, UserPutDTO } from "./user.dto";
 import { LoginHistory } from "@root/entities/user/t_login_history.entity";
 import { User } from "@root/entities/user/t_user.entity";
 import { UserFollow } from "@root/entities/user/t_user_follow.entity";
@@ -14,6 +14,54 @@ export class UserSQL {
     constructor(
         private readonly dataSource: DataSource
     ) {}
+
+    /**
+     * 회원목록 엑셀다운 
+     * 
+     * @returns 
+     */
+    async list(): Promise<Array<object>> {
+        const builder = this.dataSource.createQueryBuilder();
+        builder.select(`
+              u.user_email
+            , u.user_name
+            , u.user_nickname    
+        `);
+        builder.from('t_user', 'u');
+        builder.where('u.use_yn = :use_yn', {use_yn: 'Y'});
+        builder.orderBy('u.user_seq', 'DESC');
+        return await builder.getRawMany();
+    }
+
+    /**
+     * 회원 엑셀등록
+     * 
+     * @param dto 
+     * @returns 
+    */
+    async excelPut(dto: ExcelUserPutDTO): Promise<object> {
+        const conn = this.dataSource.createQueryRunner();
+        await conn.startTransaction();
+
+        try {
+            const user = new User();
+            user.auth_code = dto.auth_code;
+            user.provider_code = dto.provider_code;
+            user.user_email = dto.user_email;
+            user.user_name = dto.user_name;
+            user.user_nickname = dto.user_nickname;
+            user.user_pw = await util.changeBcrypt(dto.user_pw);
+            await conn.manager.insert(User, user);
+
+            await conn.commitTransaction();
+            return { statusCode: 200 }
+        } catch (error) {
+            await conn.rollbackTransaction();
+            return { statusCode: 400, message: await errorFilter.errMessageFilter(this.dataSource, error) }
+        } finally {
+            await conn.release();
+        }
+    }
 
     /**
      * 로그인 Access 토큰 재발급

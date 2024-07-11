@@ -1,6 +1,48 @@
 import { IsArray, IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsOptional, Length, Matches } from 'class-validator';
 import * as util from '@root/util/util';
 
+// 회원 엑셀등록
+export class ExcelUserPutDTO {
+    auth_code: string = 'USER';
+    provider_code: string = 'EMAIL';
+
+    @Length(6,30, {message: '이메일은 6-30자 이내여야합니다.'})
+    @IsEmail(undefined, {message: '이메일 형식이 올바르지 않습니다.'})
+    @IsNotEmpty({message: '이메일을 입력해주세요.'})
+    user_email: string;
+
+    @IsOptional()
+    @Length(2,10, {message: '이름은 2-10자 이내여야합니다.'})
+    user_name: string;
+
+    @IsOptional()
+    @Length(2,10, {message: '닉네임은 2-10자 이내여야합니다.'})
+    user_nickname: string;
+
+    @IsNotEmpty({message: '비밀번호를 입력해주세요.'})
+    user_pw: string;
+
+    @IsNotEmpty({message: '비밀번호를 모두 입력해주세요.'})
+    user_pw2: string;
+
+    @IsBoolean({message: '새 비밀번호가 서로 다릅니다.', context: {target: 'user_pw'} })
+    check_user_pw: boolean = true;
+
+    constructor(data: any) {
+        if (data) {
+            this.user_email = data['user_email'];
+            this.user_name = data['user_name'];
+            this.user_nickname = data['user_nickname'];
+            this.user_pw = data['user_pw'];
+            this.user_pw2 = data['user_pw2'];
+
+            if (this.user_pw !== this.user_pw2) {
+                this.check_user_pw = null;
+            }
+        }
+    }
+}
+
 // 로그인
 export class UserLoginDTO {
     ip: string;

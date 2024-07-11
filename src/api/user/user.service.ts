@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CheckEmailDTO, CheckNickDTO, UserAlarmDTO, UserLoginDTO, UserPatchBirthDTO, UserPatchNickDTO, UserPatchPWDTO, UserProfileDTO, UserPutDTO } from './user.dto';
+import { CheckEmailDTO, CheckNickDTO, ExcelUserPutDTO, UserAlarmDTO, UserLoginDTO, UserPatchBirthDTO, UserPatchNickDTO, UserPatchPWDTO, UserProfileDTO, UserPutDTO } from './user.dto';
 import { validateOrReject } from 'class-validator';
 import * as util from '@util/util';
 import { UserSQL } from './user.sql';
@@ -9,6 +9,31 @@ export class UserService {
     constructor(
         private readonly sql: UserSQL
     ) {}
+
+    /**
+     * 회원목록 엑셀다운 
+     * 
+     * @returns 
+     */
+    async list(): Promise<Array<object>> {
+        return await this.sql.list();
+    }
+
+    /**
+     * 회원 엑셀등록
+     * 
+     * @param dto 
+     * @returns 
+     */
+    async excelPut(dto: ExcelUserPutDTO): Promise<object> {
+        try {
+            await validateOrReject(dto);
+            return await this.sql.excelPut(dto);
+        } catch (error) {
+            const errors = await util.validationError(error);
+            return { statusCode: 400, messagE: errors[0]['message'], errors }
+        }
+    }
 
     /**
      * 로그인 Access 토큰 재발급

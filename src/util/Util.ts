@@ -307,14 +307,13 @@ export async function changeBcrypt(str: string): Promise<string> {
 
 /**
  * Bcrypt 비교
- * - 마음편해 회원정보와의 암호화 방식을 맞추기위해 $2y$를 $2b$로 치환해서 검증
  * 
  * @param {*} strA 
  * @param {*} strB 
  */
 export async function matchBcrypt(strA: string, strB: string): Promise<boolean> {
-    let match1 = await bcrypt.compare(process.env.BCRYPT_CODE + strA, strB.replace("$2y$", "$2b$"));
-    let match2 = await bcrypt.compare(process.env.BCRYPT_CODE + strB, strA.replace("$2y$", "$2b$"));
+    let match1 = await bcrypt.compare(process.env.BCRYPT_CODE + strA, strB);
+    let match2 = await bcrypt.compare(process.env.BCRYPT_CODE + strB, strA);
     return match1 || match2;
 }
 
