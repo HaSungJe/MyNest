@@ -8,7 +8,7 @@ import * as conf from './conf';
 
 
 @ApiTags('엑셀기능')
-@Controller('/api/down/excel')
+@Controller('/api/excel/down')
 @UseInterceptors(LoginInterceptor)
 export class DownloadExcelControllerLogin {
     constructor(

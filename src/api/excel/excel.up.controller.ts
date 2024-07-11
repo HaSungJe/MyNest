@@ -10,7 +10,7 @@ import * as util from '@root/util/util';
 import * as conf from './conf';
 
 @ApiTags('엑셀기능')
-@Controller('/api/up/excel')
+@Controller('/api/excel/up')
 @UseInterceptors(LoginInterceptor)
 export class UploadExcelControllerLogin {
     constructor(
