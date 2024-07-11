@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
  * @param errno 
  * @param err 
  */
-export async function errMessageFilter(dataSource: DataSource, err: any) {
+export async function errMessageFilter(dataSource: DataSource, err: any): Promise<string> {
     if (err.errno === 1062) { // 중복값
         let msg = (err.sqlMessage.substring(err.sqlMessage.indexOf('key') + 5));
         let params = (msg.substring(0, msg.length-1)).split('.');
@@ -38,7 +38,7 @@ export async function errMessageFilter(dataSource: DataSource, err: any) {
  * @param index_name 
  * @returns 
  */
-export async function getColumnMemo(dataSource: DataSource, table_name: string, index_name: string) {
+export async function getColumnMemo(dataSource: DataSource, table_name: string, index_name: string): Promise<string> {
     let builder = dataSource.createQueryBuilder();
     builder.select(['a.column_name']);
     builder.from('information_schema.statistics', 'a');
@@ -59,7 +59,7 @@ export async function getColumnMemo(dataSource: DataSource, table_name: string, 
  * @param column_name 
  * @returns 
  */
-export async function getColumnMemo2(dataSource: DataSource, column_name: string) {
+export async function getColumnMemo2(dataSource: DataSource, column_name: string): Promise<string> {
     let builder = dataSource.createQueryBuilder();
     builder.select(['a.column_comment as memo']);
     builder.from('INFORMATION_SCHEMA.COLUMNS', 'a');
