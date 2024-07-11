@@ -1,23 +1,36 @@
 import { NestFactory } from '@nestjs/core';
 import { MainModule } from './module/main.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 async function bootstrap() {
-    dotenv.config();
-    const app = await NestFactory.create(MainModule);
-
+    const app = await NestFactory.create<NestExpressApplication>(MainModule);
+    
+    // 기본 템플릿 ejs 설정
+    app.useStaticAssets(path.resolve(__dirname, '../../public'));
+    app.setBaseViewsDir(path.resolve(__dirname, '../../views'));
+    app.setViewEngine('ejs');
 
     // Swagger
     const config = new DocumentBuilder()
     .setTitle('API Document')
-    .setDescription('API description')
     .setVersion('1.0')
-    .addTag('api')
+    .addServer(process.env.SERVER_URL)
     .build();
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup('swagger', app, document);
 
-    await app.listen(3000);
+    // CORS
+    app.enableCors({
+        "origin": "*",
+        "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+        "preflightContinue": false,
+        "optionsSuccessStatus": 204
+    });
+
+    await app.listen(process.env.PORT || 3000);
 }
+
 bootstrap();
