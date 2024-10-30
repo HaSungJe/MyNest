@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AWSService } from '../api/aws/aws.service';
-import { AWSSql } from '@root/api/aws/aws.sql';
+import { AWSService } from '@root/api/common/aws/aws.service';
+import { AWSSql } from '@root/api/common/aws/aws.sql';
  
 @Module({
     exports: [AWSService, AWSSql],

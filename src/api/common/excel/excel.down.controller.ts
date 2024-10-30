@@ -2,9 +2,9 @@ import { Controller, Get, Res, UseInterceptors } from "@nestjs/common";
 import { Response } from 'express';
 import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LoginInterceptor } from "@root/interceptor/auth.interceptor";
-import { UserService } from "../user/user.service";
 import * as util from '@root/util/util';
 import * as conf from './conf';
+import { UserService } from "@root/api/v1/user/user.service";
 
 
 @ApiTags('엑셀기능')

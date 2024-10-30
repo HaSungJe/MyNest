@@ -4,10 +4,10 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from "@nestj
 import { memoryStorage } from "multer";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { LoginInterceptor } from "@root/interceptor/auth.interceptor";
-import { UserService } from "../user/user.service";
-import { ExcelUserPutDTO } from "../user/user.dto";
 import * as util from '@root/util/util';
 import * as conf from './conf';
+import { ExcelUserPutDTO } from "@root/api/v1/user/user.dto";
+import { UserService } from "@root/api/v1/user/user.service";
 
 @ApiTags('엑셀기능')
 @Controller('/api/excel/up')

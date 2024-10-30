@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeORMModule } from './typeorm.module';
-import { UploadExcelControllerLogin } from '@root/api/excel/excel.up.controller';
-import { DownloadExcelControllerLogin } from '@root/api/excel/excel.down.controller';
-import { UserModule } from './user.module';
+import { UserModule } from '../v1/user.module';
+import { UploadExcelControllerLogin } from '@root/api/common/excel/excel.up.controller';
+import { DownloadExcelControllerLogin } from '@root/api/common/excel/excel.down.controller';
 
 @Module({
     imports: [TypeORMModule, UserModule],

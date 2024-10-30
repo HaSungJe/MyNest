@@ -8,16 +8,16 @@ import { DataSource } from 'typeorm';
  * @param errno 
  * @param err 
  */
-export async function errMessageFilter(dataSource: DataSource, err: any): Promise<string> {
+export async function errMessageFilter(dataSource: DataSource, err: any) {
     if (err.errno === 1062) { // 중복값
         let msg = (err.sqlMessage.substring(err.sqlMessage.indexOf('key') + 5));
         let params = (msg.substring(0, msg.length-1)).split('.');
         let memo = await getColumnMemo(dataSource, params[0], params[1]);
-        return { message:  `이미 사용중인 ${memo} 입니다.` };
+        return `이미 사용중인 ${memo} 입니다.`;
     } else if (err.errno === 1048) { // 공백
         let column_name = err.sqlMessage.substring(err.sqlMessage.indexOf("'") + 1, err.sqlMessage.lastIndexOf("'"));
         let memo = await getColumnMemo2(dataSource, column_name);
-        return { message: `${memo}(을)를 입력해주세요.` };
+        return `${memo}(을)를 입력해주세요.`;
     } else if (err.errno === 1452) { // 올바르지 않은 외래키 입력
         let msg = err.sqlMessage.substring(err.sqlMessage.indexOf('constraint fails') + 18, err.sqlMessage.indexOf('CONSTRAINT') - 2).replaceAll("`", "");
         let table = msg.split('.');
