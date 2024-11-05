@@ -1,0 +1,20 @@
+# 빌드
+# docker-compose build ${mynext or mynext}
+
+# DockerHub 푸쉬시
+# 1. 로그인. docker login/logout. docker desktop 설치 후 로그인시, 자동 연결됨.
+# 2. tag 변경. docker tag ${mynext or mynext}:latest docker tag ${docker hub 유저명}/${mynext or mynext}:latest:
+# 3. docker push ${docker hub 유저명}/${mynext or mynext}:latest
+
+# 실행시
+# Docker Desktop으로 실행시, images에 실행버튼 클릭 후, 컨테이너 이름 입력 및 Ports -> Host port를 입력해주면 된다.
+# Host port는 아래 ports가 5000:5000일 때, 5000입력해주면 http://localhost:5000으로 접근이 가능해짐.
+
+services:
+  mynest:
+    build: .
+    image: mynest:latest
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production

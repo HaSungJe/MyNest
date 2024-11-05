@@ -3,6 +3,7 @@ import { MainModule } from './module/main.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { DashboardModule } from './module/v1/dashboard.module';
 require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 async function bootstrap() {
@@ -13,14 +14,18 @@ async function bootstrap() {
     app.setBaseViewsDir(path.resolve(__dirname, '../../views'));
     app.setViewEngine('ejs');
 
-    // Swagger
-    const config = new DocumentBuilder()
+    // API Swagger
+    const swagger_api_config = new DocumentBuilder()
     .setTitle('API Document')
     .setVersion('1.0')
     .addServer(process.env.SERVER_URL)
     .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, document);
+    const swagger_api_document = SwaggerModule.createDocument(app, swagger_api_config, {
+        include: [
+            DashboardModule
+        ]
+    });
+    SwaggerModule.setup('swagger', app, swagger_api_document);
 
     // CORS
     app.enableCors({

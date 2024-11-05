@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './v1/user.module';
+import { DashboardModule } from './v1/dashboard.module';
 import { FileModule } from './common/file.module';
-import { ExcelModule } from './common/excel.module';
 
 @Module({
     imports: [
-        UserModule, FileModule, ExcelModule
+        DashboardModule
     ]
 })
 
