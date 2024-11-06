@@ -10,6 +10,15 @@
 # Docker Desktop으로 실행시, images에 실행버튼 클릭 후, 컨테이너 이름 입력 및 Ports -> Host port를 입력해주면 된다.
 # Host port는 아래 ports가 5000:5000일 때, 5000입력해주면 http://localhost:5000으로 접근이 가능해짐.
 
+# AWS ECR에 업로드
+# 1. AWS IAM에서 사용자 권한 생성 (EC2Container, ElasticContainer 검색후 권한 추가)
+# 2. AccessKey, 및 SecretKey 발급. (SecretKey는 AccessKey 발급시 1회 표시됨.)
+# 3. AWS Cli 설치
+# 4. AWS Configure (ACcessKey, SecretKey, Region 입력. output은 json)
+# 5. AWS ECR에 Repository 생성 후 푸쉬 명령 확인 후 실행. (WindowPC도 macOS/Linux 기준으로 실행하였음)
+# 추가 1) aws configure 명령어는 cmd창을 열어서 (vscode에서 인식 못했음)
+# 추가 2) docker 명령어는 vscode 창에서 실행 가능함 
+
 services:
   mynest:
     build: .

@@ -470,13 +470,14 @@ export function readExcel(conf: any, file: Express.Multer.File) {
 
         for (let i=0; i<excel.SheetNames.length; i++) {
             let sheetName = excel.SheetNames[i];
-            let sheet = utils.sheet_to_json(excel.Sheets[sheetName]);
+            let sheet = utils.sheet_to_json(excel.Sheets[sheetName], { raw: false, dateNF: 'yyyy-mm-dd' });
             
             for (let i=0; i<sheet.length; i++) {
                 let obj = {};
                 for (let y=0; y<conf.length; y++) {
                     let data = sheet[i][conf[y]['memo']];
                     if (data) {
+                        const type = conf[y]['type'] ? conf[y]['type'] : null;
                         obj[conf[y]['column']] = data;
                     } 
                 }
