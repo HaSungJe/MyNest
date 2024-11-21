@@ -43,7 +43,7 @@ export class AdminInterceptor implements NestInterceptor {
             if (data) {
                 if (data === 'TokenExpiredError') {
                     throw new HttpException({code: 'EXPIRE_AUTH_TOKEN', message: '로그인 정보가 만료되었습니다.'}, HttpStatus.UNAUTHORIZED);
-                } else if (data['type'] !== 'access') {
+                } else if (data === 'JsonWebTokenError' || data['type'] !== 'access') {
                     throw new HttpException({code: 'FAIL_AUTH_TOKEN', message: '로그인 정보가 올바르지 않습니다.'}, HttpStatus.UNAUTHORIZED);
                 } else {
                     const user = await getUserFindSQL(this.dataSource, data.user_seq);
@@ -81,7 +81,7 @@ export class SuperAdminInterceptor implements NestInterceptor {
             if (data) {
                 if (data === 'TokenExpiredError') {
                     throw new HttpException({code: 'EXPIRE_AUTH_TOKEN', message: '로그인 정보가 만료되었습니다.'}, HttpStatus.UNAUTHORIZED);
-                } else if (data['type'] !== 'access') {
+                } else if (data === 'JsonWebTokenError' || data['type'] !== 'access') {
                     throw new HttpException({code: 'FAIL_AUTH_TOKEN', message: '로그인 정보가 올바르지 않습니다.'}, HttpStatus.UNAUTHORIZED);
                 } else {
                     const user = await getUserFindSQL(this.dataSource, data.user_seq);
