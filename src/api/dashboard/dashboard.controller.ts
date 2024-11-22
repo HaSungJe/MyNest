@@ -2,7 +2,7 @@ import { Controller, Get, Query, Res, UseInterceptors } from "@nestjs/common";
 import { DashboardService } from "./dashboard.service";
 import { LoginInterceptor } from "@root/interceptor/auth.interceptor";
 import { Response } from "express";
-import { ApiHeader, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GetDataDTO } from "./dashboard.dto";
 
 @Controller('/dashboard')
@@ -28,6 +28,11 @@ export class DashboardController {
     })
     @ApiHeader({name: 'accessToken', description: '로그인 Access Token',  example: 'fca9817c-e296-49ad-aa68-91d095cdee38', required: false})
     @ApiParam({name: 'add_text', description: '추가로 출력될 텍스트', example: '안녕!!', required: false})
+    @ApiQuery({name: 'page', description: '페이지. 기본값 1',  example: 1, required: false})
+    @ApiQuery({name: 'size', description: '페이지당 출력될 게시물 수. 기본값 20', example: 20, required: false})
+    @ApiQuery({name: 'pageSize', description: '페이지탭에 출력될 페이지의 수. 기본값 10', example: 10, required: false})
+    @ApiQuery({name: 'search_type', description: '검색종류. [ALL: 전체, TITLE: 제목, CONTENT: 내용]', example: 'ALL', required: false})
+    @ApiQuery({name: 'search_val', description: '검색어', example: '공지', required: false})
     @ApiResponse({ status: 200, description: '성공', schema: {
         type: 'object',
         properties: {
@@ -61,6 +66,13 @@ export class DashboardController {
         type: 'object',
         properties: {
             statusCode: {type: 'number', description: 'HTTP 상태코드', example: 403},
+            message: {type: 'string', description: '메세지', example: '메세지'}
+        }
+    }})
+    @ApiResponse({ status: 405, description: '올바르지 않은 로그인정보. 로그인정보 삭제필요', schema: {
+        type: 'object',
+        properties: {
+            statusCode: {type: 'number', description: 'HTTP 상태코드', example: 405},
             message: {type: 'string', description: '메세지', example: '메세지'}
         }
     }})
