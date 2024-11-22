@@ -45,6 +45,18 @@ export async function validationError(err: any) {
 }
 
 /**
+ * Create Custom Class-Validation Reject Error
+ * - 유효성 검사 커스텀 생성
+ * 
+ * @param property 
+ * @param message 
+ * @returns 
+ */
+export function createCustomValidationError(property: string, message: string): object {
+    return [{type: 'isBoolean', property, message}];
+}
+
+/**
  * Null, Undefined 체크
  * 
  * @param {*} v 변수
