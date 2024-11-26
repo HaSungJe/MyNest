@@ -5,16 +5,17 @@ import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DashboardModule } from './module/v1/dashboard.module';
 import * as bodyParser from 'body-parser';
-import { PayloadTooLargeExceptionFilter } from './exception/exception';
+import { CustomErrorFilter } from './exception/exception';
 require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(MainModule);
     
     // JSON Parser의 크기 제한 설정
-    const limit = process.env.PAYLOAD_LIMIT_SIZE;
+    const limit = '15Mb';
+    app.use(bodyParser.json({ limit }));
     app.use(bodyParser.urlencoded({ limit, extended: true }));
-    app.useGlobalFilters(new PayloadTooLargeExceptionFilter());
+    app.useGlobalFilters(new CustomErrorFilter());
 
     // 기본 템플릿 ejs 설정
     app.useStaticAssets(path.resolve(__dirname, '../../public'));
