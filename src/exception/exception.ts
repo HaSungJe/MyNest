@@ -20,6 +20,6 @@ export class CustomErrorFilter implements ExceptionFilter {
         // 다른 예외 처리
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        return response.status(exception['response']['statusCode']).send(exception['response']);
+        return response.status(exception['status']).send(exception['response']);
     }
 }
