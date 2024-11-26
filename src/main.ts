@@ -37,12 +37,13 @@ async function bootstrap() {
     // CORS
     app.enableCors({
         "origin": "*",
+        "allowedHeaders": "*",
         "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
         "preflightContinue": false,
         "optionsSuccessStatus": 204
     });
 
-    await app.listen(process.env.PORT || 3000);
+    await app.listen(process.env.SERVER_PORT || 3000);
 }
 
 bootstrap();
