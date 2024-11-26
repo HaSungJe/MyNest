@@ -23,9 +23,6 @@ export class PayloadTooLargeExceptionFilter implements ExceptionFilter {
         // 다른 예외 처리
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-            statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: '서버에서 오류가 발생했습니다.',
-        });
+        return response.status(exception['response']['statusCode']).send(exception['response']);
     }
 }
