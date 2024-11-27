@@ -20,7 +20,11 @@ export class CustomErrorFilter implements ExceptionFilter {
         // 다른 예외 처리
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        exception['response']['statusCode'] = exception['status'];
-        return response.status(exception['status']).send(exception['response']);
+        if (exception['response']) {
+            exception['response']['statusCode'] = exception['status'];
+            return response.status(exception['status']).send(exception['response']);
+        } else {
+            return response.status(500).send({statusCode: 500, message: '실패했습니다.'});
+        }
     }
 }
