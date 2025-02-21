@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { MainModule } from './module/main.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
@@ -28,12 +28,21 @@ async function bootstrap() {
     .setVersion('1.0')
     .addServer(process.env.SERVER_URL)
     .build();
-    const swagger_api_document = SwaggerModule.createDocument(app, swagger_api_config, {
-        include: [
-            DashboardModule
-        ]
-    });
-    SwaggerModule.setup('swagger', app, swagger_api_document);
+
+    // Swagger - 전체
+    SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, swagger_api_config, {
+        include: []
+    }));
+
+    // Swagger - 개별
+    const reflector = app.get(Reflector);
+    const modules = Reflect.getMetadata('imports', MainModule) || [];
+    for (let i=0; i<modules.length; i++) {
+        const path = reflector.get<string>('path', modules[i]);
+        SwaggerModule.setup(`swagger/${path}`, app, SwaggerModule.createDocument(app, swagger_api_config, {
+            include: [modules[i]]
+        }));
+    }
 
     // CORS
     app.enableCors({
