@@ -3,7 +3,6 @@ import { MainModule } from './module/main.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as path from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DashboardModule } from './module/v1/dashboard.module';
 import * as bodyParser from 'body-parser';
 import { CustomErrorFilter } from './exception/exception';
 require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
@@ -23,25 +22,56 @@ async function bootstrap() {
     app.setViewEngine('ejs');
 
     // API Swagger
-    const swagger_api_config = new DocumentBuilder()
-    .setTitle('API Document')
-    .setVersion('1.0')
-    .addServer(process.env.SERVER_URL)
-    .build();
-
-    // Swagger - 전체
-    SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, swagger_api_config, {
-        include: []
-    }));
-
-    // Swagger - 개별
     const reflector = app.get(Reflector);
     const modules = Reflect.getMetadata('imports', MainModule) || [];
+    const swaggerApiConfigData = new DocumentBuilder();
+    swaggerApiConfigData.setTitle('API Document');
+    swaggerApiConfigData.setVersion('1.0');
+    swaggerApiConfigData.addServer(`${process.env.SERVER_URL}/swagger`, '전체');
     for (let i=0; i<modules.length; i++) {
         const path = reflector.get<string>('path', modules[i]);
-        SwaggerModule.setup(`swagger/${path}`, app, SwaggerModule.createDocument(app, swagger_api_config, {
+        const description = reflector.get<string>('description', modules[i]);
+        swaggerApiConfigData.addServer(`${process.env.SERVER_URL}/swagger/${path}`, description);
+    }
+    const swaggerApiConfig = swaggerApiConfigData.build();
+    const jqueryCDN = `https://code.jquery.com/jquery-3.7.1.slim.js`;
+    const js = `
+        $(document).ready(function() {
+            // 현재 페이지 정보
+            const page = window.location.origin + window.location.pathname;
+
+            // 서버 변경시, 주소 이동
+            $(document).on('change', '#servers', function() {
+                location.href = $(this).val();
+            });
+
+            // 서버목록 해당 페이지 맞는 것으로 선택하기
+            const selectPage = setInterval(() => {
+                const box = $("#servers");
+                if (box) {
+                    box.val(page);
+                    clearInterval(selectPage);
+                }
+            }, 100);
+        });
+    `;
+    // Swagger - 전체
+    SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, swaggerApiConfig, {
+        include: [],
+    }), {
+        customJs: jqueryCDN,
+        customJsStr: js
+    });
+
+    // Swagger - 개별
+    for (let i=0; i<modules.length; i++) {
+        const path = reflector.get<string>('path', modules[i]);
+        SwaggerModule.setup(`swagger/${path}`, app, SwaggerModule.createDocument(app, swaggerApiConfig, {
             include: [modules[i]]
-        }));
+        }), {
+            customJs: jqueryCDN,
+            customJsStr: js
+        });
     }
 
     // CORS

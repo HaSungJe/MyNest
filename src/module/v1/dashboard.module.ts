@@ -3,6 +3,8 @@ import { TypeORMModule } from '../common/typeorm.module';
 import { DashboardController } from '@root/api/dashboard/dashboard.controller';
 import { DashboardService } from '@root/api/dashboard/dashboard.service';
 
+
+@SetMetadata('description', '대시보드')
 @SetMetadata('path', 'dashboard')
 @Module({
     imports: [TypeORMModule],
