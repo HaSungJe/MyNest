@@ -27,34 +27,51 @@ async function bootstrap() {
     const swaggerApiConfigData = new DocumentBuilder();
     swaggerApiConfigData.setTitle('API Document');
     swaggerApiConfigData.setVersion('1.0');
-    swaggerApiConfigData.addServer(`${process.env.SERVER_URL}/swagger`, '전체');
+    swaggerApiConfigData.addServer(process.env.SERVER_URL);
+    const swaggerApiConfig = swaggerApiConfigData.build();
+
+    // API Swagger 링크생성
+    const jqueryCDN = `https://code.jquery.com/jquery-3.7.1.slim.js`;
+    let html = `<option value="${process.env.SERVER_URL}/swagger">전체</option>`;
     for (let i=0; i<modules.length; i++) {
         const path = reflector.get<string>('path', modules[i]);
         const description = reflector.get<string>('description', modules[i]);
-        swaggerApiConfigData.addServer(`${process.env.SERVER_URL}/swagger/${path}`, description);
+        html += `<option value="${process.env.SERVER_URL}/swagger/${path}">${description}</option>`;
     }
-    const swaggerApiConfig = swaggerApiConfigData.build();
-    const jqueryCDN = `https://code.jquery.com/jquery-3.7.1.slim.js`;
     const js = `
         $(document).ready(function() {
             // 현재 페이지 정보
             const page = window.location.origin + window.location.pathname;
 
             // 서버 변경시, 주소 이동
-            $(document).on('change', '#servers', function() {
+            $(document).on('change', '#swaggerList', function() {
                 location.href = $(this).val();
             });
 
             // 서버목록 해당 페이지 맞는 것으로 선택하기
             const selectPage = setInterval(() => {
-                const box = $("#servers");
-                if (box) {
-                    box.val(page);
+                const target = $(".schemes-server-container");
+                if (target) {
+                    const html = \`
+                        <div>
+                            <span class="servers-title">Tap</span>
+                            <div class="servers">
+                                <label for="swaggerList">
+                                    <select id="swaggerList">
+                                        ${html}
+                                    </select>  
+                                </label>
+                            </div>
+                        </div>
+                    \`;
+                    target.append(html);
+                    $("#swaggerList").val(page);
                     clearInterval(selectPage);
                 }
             }, 100);
         });
     `;
+
     // Swagger - 전체
     SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, swaggerApiConfig, {
         include: [],
