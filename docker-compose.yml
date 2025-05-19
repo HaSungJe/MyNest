@@ -1,72 +1,105 @@
 version: '3.8'
 
+networks:
+  mongo-net:
+    driver: bridge
+
 services:
   mongo1:
-    image: mongo:6
+    image: mongo:6.0
     container_name: mongo1
-    hostname: mongo1
+    restart: always
     ports:
       - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
-    volumes:
-      - mongo1_data:/data/db
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo1data:/data/db
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo2:
-    image: mongo:6
+    image: mongo:6.0
     container_name: mongo2
-    hostname: mongo2
+    restart: always
     ports:
       - 27018:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
-    volumes:
-      - mongo2_data:/data/db
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo2data:/data/db
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo3:
-    image: mongo:6
+    image: mongo:6.0
     container_name: mongo3
-    hostname: mongo3
+    restart: always
     ports:
       - 27019:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
-    volumes:
-      - mongo3_data:/data/db
     command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo3data:/data/db
+    networks:
+      - mongo-net
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongo-setup:
-    image: mongo:6
+    image: mongo:6.0
+    container_name: mongo-setup
     depends_on:
-      - mongo1
-      - mongo2
-      - mongo3
-    volumes:
-      - ./init-replica.js:/docker-entrypoint-initdb.d/init-replica.js
-    entrypoint: >
-      bash -c "
-        sleep 10 &&
-        mongo --host mongo1 --username root --password example --authenticationDatabase admin /docker-entrypoint-initdb.d/init-replica.js
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    networks:
+      - mongo-net
+    command: >
+      sh -c "
+        sleep 5 &&
+        mongosh --host mongo1 --eval '
+          rs.initiate({
+            _id: \"rs0\",
+            members: [
+              {_id: 0, host: \"mongo1:27017\"},
+              {_id: 1, host: \"mongo2:27017\"},
+              {_id: 2, host: \"mongo3:27017\"}
+            ]
+          })
+        ' || echo 'Replica set already initiated';
+        sleep 2
       "
+    restart: "no"
 
-  mynest:
+  nestjs:
     build: .
-    image: mynest:latest
     container_name: mynest
     ports:
-      - "3000:3000"
+      - 7000:3000
     depends_on:
-      - mongo-setup
+      mongo-setup:
+        condition: service_completed_successfully
     environment:
-      - NODE_ENV=production
-      - MONGO_URI=mongodb://root:example@mongo1:27017,mongo2:27017,mongo3:27017/mydb?replicaSet=rs0&authSource=admin
+      MONGO_URI: "mongodb://mongo1:27017,mongo2:27017,mongo3:27017/mydb?replicaSet=rs0"
+    command: ["npm", "run", "start:prod"]
+    networks:
+      - mongo-net
 
 volumes:
-  mongo1_data:
-  mongo2_data:
-  mongo3_data:
+  mongo1data:
+  mongo2data:
+  mongo3data:

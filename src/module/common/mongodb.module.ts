@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 @Module({
     imports: [
         MongooseModule.forRoot(
-            'mongodb://root:example@mongo1:27017,mongo2:27017,mongo3:27017/mydb?replicaSet=rs0&authSource=admin',
+            'mongodb://mongo1:27017,mongo2:27017,mongo3:27017/mydb?replicaSet=rs0'
         ),
     ]
 })

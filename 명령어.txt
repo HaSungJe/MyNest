@@ -1,0 +1,4 @@
+docker-compose build
+docker-compose up -d
+docker-compose logs -f mongo-setup  # 레플리카셋 초기화 로그 확인
+docker-compose logs -f nestjs       # NestJS 정상 실행 확인
