@@ -1,4 +1,9 @@
 docker-compose build
 docker-compose up -d
 docker-compose logs -f mongo-setup  # 레플리카셋 초기화 로그 확인
-docker-compose logs -f nestjs       # NestJS 정상 실행 확인
+docker-compose logs -f mynest       # NestJS 정상 실행 확인
+
+내부접속
+cmd
+- 이미지 이름: docker images
+- 접속: docker run -it --rm --entrypoint sh 이미지이름
