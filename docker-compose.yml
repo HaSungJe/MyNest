@@ -1,29 +1,72 @@
-# 빌드
-# docker-compose build ${mynext or mynext}
-
-# DockerHub 푸쉬시
-# 1. 로그인. docker login/logout. docker desktop 설치 후 로그인시, 자동 연결됨.
-# 2. tag 변경. docker tag ${mynext or mynext}:latest docker tag ${docker hub 유저명}/${mynext or mynext}:latest:
-# 3. docker push ${docker hub 유저명}/${mynext or mynext}:latest
-
-# 실행시
-# Docker Desktop으로 실행시, images에 실행버튼 클릭 후, 컨테이너 이름 입력 및 Ports -> Host port를 입력해주면 된다.
-# Host port는 아래 ports가 5000:5000일 때, 5000입력해주면 http://localhost:5000으로 접근이 가능해짐.
-
-# AWS ECR에 업로드
-# 1. AWS IAM에서 사용자 권한 생성 (EC2Container, ElasticContainer 검색후 권한 추가)
-# 2. AccessKey, 및 SecretKey 발급. (SecretKey는 AccessKey 발급시 1회 표시됨.)
-# 3. AWS Cli 설치
-# 4. AWS Configure (ACcessKey, SecretKey, Region 입력. output은 json)
-# 5. AWS ECR에 Repository 생성 후 푸쉬 명령 확인 후 실행. (WindowPC도 macOS/Linux 기준으로 실행하였음)
-# 추가 1) aws configure 명령어는 cmd창을 열어서 (vscode에서 인식 못했음)
-# 추가 2) docker 명령어는 vscode 창에서 실행 가능함 
+version: '3.8'
 
 services:
+  mongo1:
+    image: mongo:6
+    container_name: mongo1
+    hostname: mongo1
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - mongo1_data:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+  mongo2:
+    image: mongo:6
+    container_name: mongo2
+    hostname: mongo2
+    ports:
+      - 27018:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - mongo2_data:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+  mongo3:
+    image: mongo:6
+    container_name: mongo3
+    hostname: mongo3
+    ports:
+      - 27019:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    volumes:
+      - mongo3_data:/data/db
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+  mongo-setup:
+    image: mongo:6
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    volumes:
+      - ./init-replica.js:/docker-entrypoint-initdb.d/init-replica.js
+    entrypoint: >
+      bash -c "
+        sleep 10 &&
+        mongo --host mongo1 --username root --password example --authenticationDatabase admin /docker-entrypoint-initdb.d/init-replica.js
+      "
+
   mynest:
     build: .
     image: mynest:latest
+    container_name: mynest
     ports:
       - "3000:3000"
+    depends_on:
+      - mongo-setup
     environment:
-      NODE_ENV: production
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://root:example@mongo1:27017,mongo2:27017,mongo3:27017/mydb?replicaSet=rs0&authSource=admin
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:

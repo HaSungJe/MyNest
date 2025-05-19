@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
 
 @Schema({ collection: 'api_keys' })
 export class Key {
@@ -13,5 +12,5 @@ export class Key {
     reg_dt: string;
 }
 
-export type KeyDocument = HydratedDocument<Key>;
+export type KeyDocument = Key & Document;
 export const KeySchema = SchemaFactory.createForClass(Key);
